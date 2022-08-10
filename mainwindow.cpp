@@ -62,6 +62,7 @@ void MainWindow::printWIN(){
 
 void MainWindow::printFAIL(){
     static_cast<QPushButton*>(sender())->setStyleSheet("background-color:red");
+    static_cast<QPushButton*>(sender())->setEnabled(false);
     countFails++;
 }
 
