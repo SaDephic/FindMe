@@ -12,13 +12,20 @@
 #include <QGridLayout>
 #include <QPushButton>
 
+#include <QMenuBar>
+#include <QMenu>
+#include <QAction>
+
+#include "statistics.h"
+
 class MainWindow : public QMainWindow{
     Q_OBJECT
 private:
+    Statistics *fullStatistic = nullptr;
     QPushButton *winner = nullptr;
     QWidget *basis = nullptr;
     QVector<QPushButton*> removed;
-    int countFails = 0;
+    Statistics *currentStatistic = nullptr;
 
 public:
     MainWindow();
@@ -26,6 +33,7 @@ public:
 
 private:
     void createArea();
+    void createMenu();
 
 public slots:
     void printWIN();

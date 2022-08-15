@@ -13,6 +13,8 @@ QtApplication {
         "main.cpp",
         "mainwindow.cpp",
         "mainwindow.h",
+        "statistics.cpp",
+        "statistics.h",
     ]
 
     install: true

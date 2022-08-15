@@ -2,7 +2,11 @@
 
 MainWindow::MainWindow(){
     setWindowTitle("FIND ME");
-    setFixedSize(QSize(325,325));
+
+//    setFixedSize(QSize(325,325));
+    fullStatistic = new Statistics;
+    currentStatistic = new Statistics(0,0);
+    fullStatistic->addStatistic(currentStatistic);
 
     basis = new QWidget;
     setCentralWidget(basis);
@@ -11,6 +15,7 @@ MainWindow::MainWindow(){
     shortreboot->setKey(Qt::Key_F5);
     connect(shortreboot,&QShortcut::activated,this,&MainWindow::recreate);
 
+    createMenu();
     createArea();
 }
 
@@ -22,8 +27,9 @@ MainWindow::~MainWindow(){
     }
 }
 
-void MainWindow::createArea(){
-    QGridLayout *grid = new QGridLayout(basis);
+void MainWindow::createArea(){\
+    QHBoxLayout *hlay = new QHBoxLayout(basis);
+    QGridLayout *grid = new QGridLayout;
     winner = new QPushButton("Ok");
     winner->setFixedSize(100,100);
     connect(winner,&QPushButton::clicked,this,&MainWindow::printWIN);
@@ -44,6 +50,22 @@ void MainWindow::createArea(){
             counter++;
         }
     }
+    hlay->addLayout(grid);
+    hlay->addWidget(fullStatistic);
+}
+
+void MainWindow::createMenu(){
+    QMenuBar *menu = new QMenuBar;
+    setMenuBar(menu);
+    QMenu *game = new QMenu("Игра");
+    menu->addMenu(game);
+    QAction *reset = new QAction("Перезапустить");
+    connect(reset,&QAction::triggered,this,&MainWindow::recreate);
+    game->addAction(reset);
+
+    QAction *fullstat = new QAction("Полная статистика");
+    connect(fullstat,&QAction::triggered,fullStatistic,&Statistics::showExtendedStat);
+    game->addAction(fullstat);
 }
 
 void MainWindow::printWIN(){
@@ -51,23 +73,30 @@ void MainWindow::printWIN(){
     QMessageBox message;
     message.setWindowFlag(Qt::WindowStaysOnTopHint);
     message.setWindowTitle("Congratulation");
-    message.setText("YOU WIN!\nFAILS:" + QVariant(countFails+1).toString());
+    message.setText("YOU WIN!\nFAILS:" + QVariant(currentStatistic->fail+1).toString());
     message.setIcon(QMessageBox::Information);
     message.exec();
+
+    currentStatistic->win = 1;
+
     foreach(QPushButton *cur,removed){
         cur->setEnabled(false);
     }
     winner->setEnabled(false);
+
+    fullStatistic->update();
 }
 
 void MainWindow::printFAIL(){
     static_cast<QPushButton*>(sender())->setStyleSheet("background-color:red");
     static_cast<QPushButton*>(sender())->setEnabled(false);
-    countFails++;
+    currentStatistic->fail++;
+    fullStatistic->update();
 }
 
 void MainWindow::recreate(){
-    countFails = 0;
+    currentStatistic = new Statistics(0,0);
+    fullStatistic->addStatistic(currentStatistic);
 
     while(!removed.isEmpty()){
         delete removed.first();
